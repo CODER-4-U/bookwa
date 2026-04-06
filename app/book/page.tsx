@@ -35,8 +35,22 @@ export default function BookingForm() {
         time: form.time,
       }
     ])
-    if (error) alert(error.message)
-    else setSuccess(true)
+    if (error) {
+      alert(error.message)
+    } else {
+      await fetch('/api/send-whatsapp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerPhone: form.customer_phone,
+          customerName: form.customer_name,
+          service: form.service,
+          date: form.date,
+          time: form.time
+        })
+      })
+      setSuccess(true)
+    }
     setLoading(false)
   }
 
@@ -65,33 +79,33 @@ export default function BookingForm() {
           type="text"
           placeholder="Customer Name"
           value={form.customer_name}
-          onChange={e => setForm({...form, customer_name: e.target.value})}
+          onChange={e => setForm({ ...form, customer_name: e.target.value })}
           className="w-full border rounded-xl px-4 py-3 mb-3 text-gray-800 focus:outline-none focus:border-green-500"
         />
         <input
           type="text"
           placeholder="Customer Phone (WhatsApp)"
           value={form.customer_phone}
-          onChange={e => setForm({...form, customer_phone: e.target.value})}
+          onChange={e => setForm({ ...form, customer_phone: e.target.value })}
           className="w-full border rounded-xl px-4 py-3 mb-3 text-gray-800 focus:outline-none focus:border-green-500"
         />
         <input
-           type="text"
-           placeholder="Service (e.g. Haircut, Consultation, Bus Ticket...)"
-           value={form.service}
-           onChange={e => setForm({...form, service: e.target.value})}
-           className="w-full border rounded-xl px-4 py-3 mb-3 text-gray-800 focus:outline-none focus:border-green-500"
-         />
+          type="text"
+          placeholder="Service (e.g. Haircut, Consultation, Bus Ticket...)"
+          value={form.service}
+          onChange={e => setForm({ ...form, service: e.target.value })}
+          className="w-full border rounded-xl px-4 py-3 mb-3 text-gray-800 focus:outline-none focus:border-green-500"
+        />
         <input
           type="date"
           value={form.date}
-          onChange={e => setForm({...form, date: e.target.value})}
+          onChange={e => setForm({ ...form, date: e.target.value })}
           className="w-full border rounded-xl px-4 py-3 mb-3 text-gray-800 focus:outline-none focus:border-green-500"
         />
         <input
           type="time"
           value={form.time}
-          onChange={e => setForm({...form, time: e.target.value})}
+          onChange={e => setForm({ ...form, time: e.target.value })}
           className="w-full border rounded-xl px-4 py-3 mb-6 text-gray-800 focus:outline-none focus:border-green-500"
         />
 
