@@ -24,7 +24,15 @@ export default function Dashboard() {
       .order('created_at', { ascending: false })
     if (data) setBookings(data)
   }
+    const updateStatus = async (id: string, status: string) => {
+    await supabase.from('bookings').update({ status }).eq('id', id)
+    fetchBookings(user.id)
+  }
 
+  const deleteBooking = async (id: string) => {
+    await supabase.from('bookings').delete().eq('id', id)
+    fetchBookings(user.id)
+  }
   const handleLogout = async () => {
     await supabase.auth.signOut()
     window.location.href = '/login'
@@ -104,9 +112,20 @@ export default function Dashboard() {
                     <td className="py-3 text-gray-800">{booking.date}</td>
                     <td className="py-3 text-gray-800">{booking.time}</td>
                     <td className="py-3">
-                      <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
-                        {booking.status}
-                      </span>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => updateStatus(booking.id, 'completed')}
+                          className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm hover:bg-green-200"
+                        >
+                          ✅ Complete
+                        </button>
+                        <button
+                          onClick={() => deleteBooking(booking.id)}
+                          className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm hover:bg-red-200"
+                        >
+                          🗑️ Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
