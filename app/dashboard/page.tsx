@@ -6,16 +6,6 @@ export default function Dashboard() {
   const [user, setUser] = useState<any>(null)
   const [bookings, setBookings] = useState<any[]>([])
 
-  useEffect(() => {
-    const getUser = async () => {
-      const { data } = await supabase.auth.getUser()
-      if (!data.user) window.location.href = '/login'
-      setUser(data.user)
-      if (data.user) fetchBookings(data.user.id)
-    }
-    getUser()
-  }, [])
-
   const fetchBookings = async (userId: string) => {
     const { data } = await supabase
       .from('bookings')
@@ -24,15 +14,43 @@ export default function Dashboard() {
       .order('created_at', { ascending: false })
     if (data) setBookings(data)
   }
-    const updateStatus = async (id: string, status: string) => {
-    await supabase.from('bookings').update({ status }).eq('id', id)
-    fetchBookings(user.id)
+
+  const updateStatus = async (id: string) => {
+    const { error } = await supabase
+      .from('bookings')
+      .update({ status: 'completed' })
+      .eq('id', id)
+    if (error) alert(error.message)
+    else {
+      const { data } = await supabase.auth.getUser()
+      if (data.user) fetchBookings(data.user.id)
+    }
   }
 
   const deleteBooking = async (id: string) => {
-    await supabase.from('bookings').delete().eq('id', id)
-    fetchBookings(user.id)
+    const { error } = await supabase
+      .from('bookings')
+      .delete()
+      .eq('id', id)
+    if (error) alert(error.message)
+    else {
+      const { data } = await supabase.auth.getUser()
+      if (data.user) fetchBookings(data.user.id)
+    }
   }
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data } = await supabase.auth.getUser()
+      if (!data.user) window.location.href = '/login'
+      else {
+        setUser(data.user)
+        fetchBookings(data.user.id)
+      }
+    }
+    getUser()
+  }, [])
+
   const handleLogout = async () => {
     await supabase.auth.signOut()
     window.location.href = '/login'
@@ -44,7 +62,12 @@ export default function Dashboard() {
   return (
     <main className="min-h-screen bg-gray-50">
       <nav className="bg-white border-b px-8 py-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-green-600">BookWA 📅</h1>
+        <h1 
+          onClick={() => window.location.href = '/'}
+          className="text-2xl font-bold text-green-600 cursor-pointer hover:opacity-80"
+        >
+          BookWA 📅
+        </h1>
         <div className="flex items-center gap-4">
           <span className="text-gray-700">{user?.email}</span>
           <button
@@ -59,12 +82,16 @@ export default function Dashboard() {
       <div className="max-w-6xl mx-auto px-8 py-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <div className="bg-white p-6 rounded-xl shadow text-center">
-            <p className="text-4xl font-bold text-green-600">{bookings.length}</p>
-            <p className="text-gray-700 mt-2">Total Bookings</p>
+            <p className="text-4xl font-bold text-green-600">
+              {bookings.filter(b => b.status !== 'completed').length}
+            </p>
+            <p className="text-gray-700 mt-2">Active Bookings</p>
           </div>
           <div className="bg-white p-6 rounded-xl shadow text-center">
-            <p className="text-4xl font-bold text-green-600">{todayBookings.length}</p>
-            <p className="text-gray-700 mt-2">Today's Appointments</p>
+            <p className="text-4xl font-bold text-green-600">
+              {bookings.filter(b => b.status === 'completed').length}
+            </p>
+            <p className="text-gray-700 mt-2">Completed</p>
           </div>
           <div className="bg-white p-6 rounded-xl shadow text-center">
             <p className="text-4xl font-bold text-green-600">
@@ -92,45 +119,82 @@ export default function Dashboard() {
               <p className="text-gray-500 mt-2">Click New Booking to get started</p>
             </div>
           ) : (
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-3 text-gray-700">Customer</th>
-                  <th className="text-left py-3 text-gray-700">Phone</th>
-                  <th className="text-left py-3 text-gray-700">Service</th>
-                  <th className="text-left py-3 text-gray-700">Date</th>
-                  <th className="text-left py-3 text-gray-700">Time</th>
-                  <th className="text-left py-3 text-gray-700">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {bookings.map((booking, i) => (
-                  <tr key={i} className="border-b hover:bg-gray-50">
-                    <td className="py-3 text-gray-800">{booking.customer_name}</td>
-                    <td className="py-3 text-gray-800">{booking.customer_phone}</td>
-                    <td className="py-3 text-gray-800">{booking.service}</td>
-                    <td className="py-3 text-gray-800">{booking.date}</td>
-                    <td className="py-3 text-gray-800">{booking.time}</td>
-                    <td className="py-3">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => updateStatus(booking.id, 'completed')}
-                          className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm hover:bg-green-200"
-                        >
-                          ✅ Complete
-                        </button>
-                        <button
-                          onClick={() => deleteBooking(booking.id)}
-                          className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm hover:bg-red-200"
-                        >
-                          🗑️ Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <>
+              {/* Active Bookings */}
+              <h3 className="text-lg font-bold text-gray-800 mb-3">🟡 Active Bookings</h3>
+              {bookings.filter(b => b.status !== 'completed').length === 0 ? (
+                <p className="text-gray-500 mb-6">No active bookings!</p>
+              ) : (
+                <table className="w-full mb-10">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 text-gray-700">Customer</th>
+                      <th className="text-left py-3 text-gray-700">Phone</th>
+                      <th className="text-left py-3 text-gray-700">Service</th>
+                      <th className="text-left py-3 text-gray-700">Date</th>
+                      <th className="text-left py-3 text-gray-700">Time</th>
+                      <th className="text-left py-3 text-gray-700">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bookings.filter(b => b.status !== 'completed').map((booking, i) => (
+                      <tr key={i} className="border-b hover:bg-gray-50">
+                        <td className="py-3 text-gray-800">{booking.customer_name}</td>
+                        <td className="py-3 text-gray-800">{booking.customer_phone}</td>
+                        <td className="py-3 text-gray-800">{booking.service}</td>
+                        <td className="py-3 text-gray-800">{booking.date}</td>
+                        <td className="py-3 text-gray-800">{booking.time}</td>
+                        <td className="py-3">
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => updateStatus(booking.id)}
+                              className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm hover:bg-green-200"
+                            >
+                              ✅ Complete
+                            </button>
+                            <button
+                              onClick={() => deleteBooking(booking.id)}
+                              className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm hover:bg-red-200"
+                            >
+                              🗑️ Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+
+              {/* Completed Bookings */}
+              <h3 className="text-lg font-bold text-gray-800 mb-3">✅ Completed Bookings</h3>
+              {bookings.filter(b => b.status === 'completed').length === 0 ? (
+                <p className="text-gray-500">No completed bookings yet!</p>
+              ) : (
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 text-gray-700">Customer</th>
+                      <th className="text-left py-3 text-gray-700">Phone</th>
+                      <th className="text-left py-3 text-gray-700">Service</th>
+                      <th className="text-left py-3 text-gray-700">Date</th>
+                      <th className="text-left py-3 text-gray-700">Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bookings.filter(b => b.status === 'completed').map((booking, i) => (
+                      <tr key={i} className="border-b bg-green-50">
+                        <td className="py-3 text-gray-800">{booking.customer_name}</td>
+                        <td className="py-3 text-gray-800">{booking.customer_phone}</td>
+                        <td className="py-3 text-gray-800">{booking.service}</td>
+                        <td className="py-3 text-gray-800">{booking.date}</td>
+                        <td className="py-3 text-gray-800">{booking.time}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </>
           )}
         </div>
       </div>
