@@ -1,8 +1,21 @@
 'use client'
 import { useRouter } from 'next/navigation'
+import { supabase } from '../lib/supabase'
+import { useState, useEffect } from 'react'
 
 export default function Home() {
-  const router = useRouter()
+    const router = useRouter()
+
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data } = await supabase.auth.getUser()
+      if (data.user) setIsLoggedIn(true)
+    }
+    checkUser()
+  }, [])
 
   return (
     <main className="min-h-screen bg-white">
@@ -17,11 +30,19 @@ export default function Home() {
         <div className="flex gap-4 items-center">
           <a href="#features" className="text-gray-600 hover:text-green-600">Features</a>
           <a href="#pricing" className="text-gray-600 hover:text-green-600">Pricing</a>
-          <button 
-            onClick={() => router.push('/login')}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-            Get Started Free
-          </button>
+          {isLoggedIn ? (
+  <button
+      onClick={() => router.push('/dashboard')}
+      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+      Go to Dashboard
+    </button>
+  ) : (
+    <button
+      onClick={() => router.push('/signup')}
+      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+      Get Started Free
+    </button>
+  )}
         </div>
       </nav>
 
@@ -34,7 +55,7 @@ export default function Home() {
           Let your customers book appointments via WhatsApp automatically. No phone calls. No chaos. Just bookings.
         </p>
         <button 
-          onClick={() => router.push('/login')}
+          onClick={() => router.push('/signup')}
           className="mt-8 bg-green-600 text-white px-8 py-4 rounded-xl text-xl hover:bg-green-700 transition">
           Start Free Today
         </button>
@@ -163,7 +184,7 @@ export default function Home() {
               <li>❌ Multiple staff</li>
             </ul>
             <button 
-              onClick={() => router.push('/login')}
+              onClick={() => router.push('/signup')}
               className="w-full border-2 border-green-600 text-green-600 py-3 rounded-xl hover:bg-green-50 transition">
               Get Started Free
             </button>

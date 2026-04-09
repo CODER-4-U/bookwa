@@ -1,6 +1,6 @@
 'use client'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
+
 
 export default function Upgrade() {
   const router = useRouter()
@@ -18,12 +18,12 @@ export default function Upgrade() {
         >
           BookWA 📅
         </h1>
-        <button
-          onClick={() => router.push('/dashboard')}
+        {/* <button
+          onClick={() => router.push('/landingpage')}
           className="text-gray-600 hover:text-green-600"
         >
-          Back to Dashboard
-        </button>
+          back to home
+        </button> */}
       </nav>
 
       {/* Main content */}
@@ -87,7 +87,7 @@ export default function Upgrade() {
               <li>✅ Secure and Encrypted</li>
             </ul>
             <div className="flex justify-center mb-4">
-              <Image
+              <img
                 src="/qr-payment.png"
                 alt="Scan to Pay"
                 width={150}
@@ -110,22 +110,35 @@ export default function Upgrade() {
 
           {/* Pakistan Payment */}
           <div className="bg-white rounded-2xl shadow p-6 border-2 border-green-100">
-            <div className="text-4xl mb-3">🇵🇰</div>
+            <div className="text-sm mb-3 text-gray-800">🇵🇰</div>
             <h3 className="text-xl font-bold text-gray-800 mb-2">
-              Pakistan Payment
+              Pakistan Payments
             </h3>
             <p className="text-gray-600 mb-4 text-sm">
-              Pay via JazzCash or Easypaisa
+              Pay via JazzCash
             </p>
             <div className="bg-green-50 rounded-xl p-4 mb-4">
-              <p className="text-gray-800 font-bold text-center text-xl">
-                📱 03231589866
+              <p className="text-gray-800 font-bold text-center text-xl flex items-center justify-center gap-2">
+                <img src="jazzcash.png" className="w-7 h-7" alt="easypaisa" />
+                03405137118
               </p>
               <p className="text-gray-600 text-center text-sm mt-1">
-                JazzCash / Easypaisa
+                JazzCash
               </p>
               <p className="text-gray-600 text-center text-sm">
-                Account: Mutee Ur Rehman
+                Account: shamsa khawal
+              </p>
+            </div>
+            <div className="bg-green-50 rounded-xl p-4 mb-4">
+              <p className="text-gray-800 font-bold text-center text-xl flex items-center justify-center gap-2">
+                <img src="easypaisa.png" className="w-7 h-7" alt="easypaisa" />
+                03405137118
+              </p>
+              <p className="text-gray-600 text-center text-sm mt-1">
+                Easypaisa
+              </p>
+              <p className="text-gray-600 text-center text-sm">
+                Account: shamsa khawal
               </p>
             </div>
             <div className="bg-yellow-50 rounded-xl p-3 mb-4">
@@ -134,11 +147,13 @@ export default function Upgrade() {
               </p>
             </div>
             <a
-              href={`mailto:${contactEmail}?subject=BookWA Pro Payment&body=I have paid for BookWA Pro. My BookWA account email is: `}
-              className="block w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition text-center"
-            >
-              Send Payment Proof 📧
-            </a>
+            href="https://mail.google.com/mail/?view=cm&fs=1&to=muteerehman854@gmail.com&su=BookWA+Pro+Payment&body=I+have+paid+for+BookWA+Pro.+My+BookWA+account+email+is:"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition text-center"
+          >
+            Send Payment Proof 📧
+          </a>
           </div>
         </div>
 
@@ -149,7 +164,7 @@ export default function Upgrade() {
           </h3>
           <ol className="text-gray-700 space-y-2">
             <li>
-              1️⃣ Send payment screenshot to <strong>{contactEmail}</strong>
+              1️⃣ Send payment screenshot to <a href="https://mail.google.com/mail/?view=cm&fs=1&to=muteerehman854@gmail.com&su=BookWA+Pro+Payment&body=Hello,%0A%0AI%20have%20paid%20for%20BookWA%20Pro.%20Here%20is%20my%20payment%20screenshot%20attached.%0A%0AMy%20BookWA%20account%20email%20is:%20[your%20account%20email]%0A%0AThank%20you" target = "_blank"><strong>{contactEmail}</strong></a>
             </li>
             <li>2️⃣ Include your BookWA account email</li>
             <li>3️⃣ We activate Pro within <strong>2 hours</strong></li>
