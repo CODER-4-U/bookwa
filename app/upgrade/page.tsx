@@ -1,12 +1,64 @@
 'use client'
-import { useRouter } from 'next/navigation'
 
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { supabase } from '../../lib/supabase'
 
 export default function Upgrade() {
   const router = useRouter()
   const payoneerLink =
     'https://link.payoneer.com/Token?t=717AF8F4A66A420E8DACC158E8E40E23&src=pl'
   const contactEmail = 'muteerehamn854@gmail.com'
+
+  const [user, setUser] = useState<any>(null)
+const [plan, setPlan] = useState<any>(null)
+const [loading, setLoading] = useState(false)
+
+useEffect(() => {
+  const getUser = async () => {
+    const { data } = await supabase.auth.getUser()
+    if (data.user) {
+      setUser(data.user)
+      const { data: planData } = await supabase
+        .from('user_plans')
+        .select('*')
+        .eq('user_id', data.user.id)
+        .single()
+      setPlan(planData)
+    }
+  }
+  getUser()
+}, [])
+
+const startTrial = async () => {
+  if (!user) {
+    window.location.href = '/signup'
+    return
+  }
+  setLoading(true)
+  const trialEnd = new Date()
+  trialEnd.setDate(trialEnd.getDate() + 14)
+  
+  const { error } = await supabase
+    .from('user_plans')
+    .update({
+      plan: 'trial',
+      trial_start: new Date().toISOString(),
+      trial_end: trialEnd.toISOString(),
+      trial_used: true
+    })
+    .eq('user_id', user.id)
+
+  if (error) {
+    alert('Error: ' + error.message)
+    setLoading(false)
+    return
+  }
+  window.location.href = '/dashboard'
+}
+
+const trialUsed = plan?.trial_used
+const trialExpired = trialUsed && new Date(plan?.trial_end) < new Date()
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -42,6 +94,32 @@ export default function Upgrade() {
           <p className="text-gray-500 mt-2">First 14 days completely FREE</p>
         </div>
 
+        {!trialUsed && (
+  <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-6 mb-8 text-center">
+    <h3 className="text-2xl font-bold text-gray-800 mb-2">
+      🎉 Start FREE 14-Day Trial
+    </h3>
+    <p className="text-gray-600 mb-4">
+      Full Pro access for 14 days — No credit card required!
+    </p>
+    <button
+      onClick={startTrial}
+      disabled={loading}
+      className="bg-green-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-green-700"
+    >
+      {loading ? 'Starting...' : 'Start Free Trial Now →'}
+    </button>
+    <p className="text-gray-400 text-sm mt-3">No credit card needed</p>
+  </div>
+)}
+
+{trialExpired && (
+  <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6 text-center">
+    <p className="text-yellow-700 font-bold">⏰ Your 14-day trial has ended!</p>
+    <p className="text-yellow-600 text-sm">Subscribe now to continue</p>
+  </div>
+)}
+
         {/* Features */}
         <div className="bg-white rounded-2xl shadow p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">
@@ -64,6 +142,7 @@ export default function Upgrade() {
             ))}
           </div>
         </div>
+
 
         {/* Payment Methods */}
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">

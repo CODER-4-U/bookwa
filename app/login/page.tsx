@@ -11,16 +11,16 @@ export default function Login() {
   const [googleLoading, setGoogleLoading] = useState(false)
   const [message, setMessage] = useState('')
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) router.push("/dashboard")
-    })
-    window.addEventListener('pageshow', (e) => {
-      if (e.persisted) {
-        setGoogleLoading(false)
-      }
-    })
-  }, [])
+ useEffect(() => {
+  const checkSession = async () => {
+    const { data } = await supabase.auth.getSession()
+    if (data.session) {
+      router.replace("/dashboard")
+      return
+    }
+  }
+  checkSession()
+}, [])
 
   const handleLogin = async () => {
     if (!email || !password) {

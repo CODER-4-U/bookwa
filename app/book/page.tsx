@@ -25,6 +25,13 @@ export default function BookingForm() {
 
   const handleSubmit = async () => {
     setLoading(true)
+
+  let phone = form.customer_phone.trim()
+  if (phone.startsWith('0')) {
+    phone = '+92' + phone.slice(1)
+  } else if (!phone.startsWith('+')) {
+    phone = '+' + phone
+  }
     const { error } = await supabase.from('bookings').insert([
       {
         user_id: user?.id,
@@ -38,17 +45,20 @@ export default function BookingForm() {
     if (error) {
       alert(error.message)
     } else {
-      await fetch('/api/send-whatsapp', {
-        method: 'POST',
+      const response = await fetch('/api/send-whatsapp', {
+         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customerPhone: form.customer_phone,
-          customerName: form.customer_name,
-          service: form.service,
-          date: form.date,
-          time: form.time
-        })
+  customerPhone: phone,
+  customerName: form.customer_name,
+  service: form.service,
+  date: form.date,
+  time: form.time
+})
       })
+      const result = await response.json()
+      console.log('WhatsApp result:', result)
+
       setSuccess(true)
     }
     setLoading(false)
@@ -84,7 +94,7 @@ export default function BookingForm() {
         />
         <input
           type="text"
-          placeholder="Customer Phone (WhatsApp)"
+          placeholder="Customer Phone (WhatsApp +92)"
           value={form.customer_phone}
           onChange={e => setForm({ ...form, customer_phone: e.target.value })}
           className="w-full border rounded-xl px-4 py-3 mb-3 text-gray-800 focus:outline-none focus:border-green-500"
