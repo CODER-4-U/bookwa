@@ -94,7 +94,7 @@ export default function BookingForm() {
         />
         <input
           type="text"
-          placeholder="Customer Phone (WhatsApp +92)"
+          placeholder="WhatsApp No. with country code (e.g +92 or +14)"
           value={form.customer_phone}
           onChange={e => setForm({ ...form, customer_phone: e.target.value })}
           className="w-full border rounded-xl px-4 py-3 mb-3 text-gray-800 focus:outline-none focus:border-green-500"
