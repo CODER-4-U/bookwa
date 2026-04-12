@@ -118,6 +118,33 @@ export default function Home() {
         </div>
       </section>
 
+ <div className="py-10 border-y border-gray-100 overflow-hidden">
+ <p className="text-center text-gray-500 text-sm mb-6 uppercase tracking-widest font-medium">
+  🌍 Trusted by 500+ Businesses Worldwide
+</p>
+  <div className="flex gap-12 animate-marquee whitespace-nowrap items-center">
+    {[
+      { name: 'Zee Barbers', color: '#1a1a2e' },
+      { name: 'Royal Salon', color: '#c0392b' },
+      { name: 'MedCare Clinic', color: '#2980b9' },
+      { name: 'Beauty Studio', color: '#8e44ad' },
+      { name: 'City Clinic', color: '#27ae60' },
+      { name: 'Barber Kings', color: '#e67e22' },
+      { name: 'Glamour Spa', color: '#e91e8c' },
+      { name: 'Zee Barbers', color: '#1a1a2e' },
+      { name: 'Royal Salon', color: '#c0392b' },
+      { name: 'MedCare Clinic', color: '#2980b9' },
+      { name: 'Beauty Studio', color: '#8e44ad' },
+      { name: 'City Clinic', color: '#27ae60' },
+    ].map((brand, i) => (
+      <span key={i} style={{ color: brand.color }}
+        className="text-xl font-bold inline-block opacity-70 hover:opacity-100 transition">
+        ● {brand.name}
+      </span>
+    ))}
+  </div>
+</div>
+
       {/* Demo Section */}
       <section className="px-8 py-20 bg-gray-800">
         <h3 className="text-3xl font-bold text-center text-white mb-4">See How It Works</h3>
