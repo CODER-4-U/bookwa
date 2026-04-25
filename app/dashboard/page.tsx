@@ -143,6 +143,8 @@ export default function Dashboard() {
   const isPro = plan?.is_pro
   const trialActive = plan?.trial_used && trialDaysLeft > 0
   const isTrialExpired = plan?.trial_used && trialDaysLeft <= 0
+  
+  const isFreeUser = !isPro && !trialActive
   const hasFullAccess = isPro || trialActive
 
   const filteredBookings = bookings.filter(b =>
@@ -157,7 +159,7 @@ export default function Dashboard() {
     <main className="min-h-screen bg-gray-50">
 
       {/* Trial Expired Popup */}
-      {showUpgradePopup && (
+      {/* {showUpgradePopup && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 text-center shadow-2xl">
             <p className="text-5xl mb-4">⏰</p>
@@ -172,7 +174,41 @@ export default function Dashboard() {
             <p className="text-gray-400 text-sm">7-day money back guarantee</p>
           </div>
         </div>
-      )}
+      )} */}
+      {showUpgradePopup && (
+  <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+    <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 text-center shadow-2xl">
+      <p className="text-5xl mb-4">⏰</p>
+      <h2 className="text-2xl font-bold text-gray-800 mb-2">
+        Your 14-Day Trial Has Ended!
+      </h2>
+      <p className="text-gray-600 mb-6">
+        Upgrade to Pro to continue all features, or continue with free plan!
+      </p>
+      <button
+        onClick={() => window.open('/upgrade', '_blank')}
+        className="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 mb-3"
+      >
+        Upgrade to Pro — $19/month 🚀
+      </button>
+      <button
+        onClick={async () => {
+          await supabase
+            .from('user_plans')
+            .update({ plan: 'free', trial_used: true })
+            .eq('user_id', user.id)
+          setShowUpgradePopup(false)
+        }}
+        className="w-full border-2 border-gray-300 text-gray-600 py-3 rounded-xl hover:bg-gray-50"
+      >
+        Continue as Free Plan
+      </button>
+      <p className="text-gray-400 text-xs mt-3">
+        Free plan includes 50 bookings/month
+      </p>
+    </div>
+  </div>
+)}
 
       {/* Navbar */}
       <nav className="bg-white border-b px-8 py-4 flex justify-between items-center">
@@ -225,7 +261,7 @@ export default function Dashboard() {
       </nav>
       
       {/* Content */}
-      <div className={`max-w-6xl mx-auto px-8 py-10 ${isTrialExpired && !isPro ? 'blur-sm pointer-events-none select-none' : ''}`}>
+      <div className="max-w-6xl mx-auto px-8 py-10">
 
 {/* Booking Link */}
 <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4 mb-6">
